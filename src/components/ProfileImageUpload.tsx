@@ -65,6 +65,17 @@ const ProfileImageUpload = () => {
 
       if (uploadError) throw uploadError;
 
+      // Get public URL
+      const { data } = supabase.storage
+        .from('profile-images')
+        .getPublicUrl(filePath);
+
+      // Update profile with new avatar URL
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: data.publicUrl })
+        .eq('id', user.id);
+
       await refreshProfile();
       setSelectedFile(null);
       setPreviewUrl(null);
