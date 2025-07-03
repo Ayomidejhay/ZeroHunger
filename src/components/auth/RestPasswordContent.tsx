@@ -45,7 +45,7 @@ const RestPasswordContent = () => {
           const hashParams = new URLSearchParams(window.location.hash.substring(1));
           const accessToken = hashParams.get('access_token');
           const refreshToken = hashParams.get('refresh_token');
-          
+        };
           if (accessToken && refreshToken) {
             // Set the session from URL params
             const { error: setSessionError } = await supabase.auth.setSession({
