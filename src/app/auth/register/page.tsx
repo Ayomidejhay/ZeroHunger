@@ -72,7 +72,7 @@ const page = () => {
         toast("Welcome to ZeroHunger!", {
           description: "Your account has been created successfully. Please check your email to verify your account.",
         });
-        navigate("/auth/login");
+        navigate.push("/auth/login");
       }
     } catch (err: any) {
       toast("Error",{
