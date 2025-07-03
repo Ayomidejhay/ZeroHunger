@@ -1,4 +1,6 @@
 'use client';
+
+import React, {Suspense} from 'react'
 import RestPasswordContent from '@/components/auth/RestPasswordContent'
 
 
