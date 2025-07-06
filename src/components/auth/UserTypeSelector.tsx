@@ -34,7 +34,7 @@ const UserTypeSelector = ({userType, onUserTypeChange} : UserTypeSelectorProps) 
           <SelectItem value="recipient">
             <div className="flex items-center space-x-2">
               <Users className="h-4 w-4" />
-              <span>Receive food donations (NGOs, community groups, or individuals)</span>
+              <span>Receive food donations (NGOs, or individuals)</span>
             </div>
           </SelectItem>
         </SelectContent>
