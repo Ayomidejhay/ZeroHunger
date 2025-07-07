@@ -77,12 +77,7 @@ export default function Header() {
             {user ? (
               <div className="flex items-center space-x-4">
                 <NotificationButton />
-                <Link 
-                  href="/profile" 
-                  className="text-neutral700 hover:text-defaultgreen transition-colors"
-                >
-                  Profile
-                </Link>
+                
                 {profile && (
                   <span className="text-sm text-neutral600">
                     Welcome, {profile.first_name || 'User'} 
