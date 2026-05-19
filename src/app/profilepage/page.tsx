@@ -65,25 +65,25 @@ export default function Profilepage() {
               <Tabs defaultValue="personal" className="space-y-6">
                 <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="personal" className="flex items-center">
-                    <User className="h-4 w-4 mr-2" />
+                    <User className="h-4 w-4 mr-2 hidden md:block" />
                     Personal
                   </TabsTrigger>
                   <TabsTrigger
                     value="preferences"
                     className="flex items-center"
                   >
-                    <Settings className="h-4 w-4 mr-2" />
+                    <Settings className="h-4 w-4 mr-2 hidden md:block" />
                     Preferences
                   </TabsTrigger>
                   <TabsTrigger
                     value="notifications"
                     className="flex items-center"
                   >
-                    <Bell className="h-4 w-4 mr-2" />
+                    <Bell className="h-4 w-4 mr-2 hidden md:block" />
                     Notifications
                   </TabsTrigger>
                   <TabsTrigger value="stats" className="flex items-center">
-                    <BarChart3 className="h-4 w-4 mr-2" />
+                    <BarChart3 className="h-4 w-4 mr-2 hidden md:block" />
                     Impact
                   </TabsTrigger>
                 </TabsList>

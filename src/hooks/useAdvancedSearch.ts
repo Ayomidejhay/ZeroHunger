@@ -70,13 +70,13 @@ export const useAdvancedSearch = () => {
             endDate = new Date('2099-12-31');
         }
         
-        query = query.lte('expires_at', endDate.toISOString());
+        query = query.lte('expiration', endDate.toISOString());
       }
 
       // Apply sorting
       switch (filters.sortBy) {
         case 'expiry':
-          query = query.order('expires_at', { ascending: true });
+          query = query.order('expiration', { ascending: true });
           break;
         case 'quantity':
           query = query.order('quantity', { ascending: false });

@@ -125,9 +125,12 @@ const PaginatedReservationsList = ({ reservations, isLoading}: PaginatedReservat
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Locations</SelectItem>
-              {uniqueLocations.map(location => (
+              {/* {uniqueLocations.map(location => (
                 <SelectItem key={location} value={location}>{location}</SelectItem>
-              ))}
+              ))} */}
+              {uniqueLocations.filter(l => !!l).map(location => (
+  <SelectItem key={location} value={location}>{location}</SelectItem>
+))}
             </SelectContent>
           </Select>
 
@@ -137,9 +140,12 @@ const PaginatedReservationsList = ({ reservations, isLoading}: PaginatedReservat
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
-              {uniqueCategories.map(category => (
+              {/* {uniqueCategories.map(category => (
                 <SelectItem key={category} value={category}>{category}</SelectItem>
-              ))}
+              ))} */}
+              {uniqueCategories.filter(c => !!c).map(category => (
+  <SelectItem key={category} value={category}>{category}</SelectItem>
+))}
             </SelectContent>
           </Select>
         </div>

@@ -84,5 +84,5 @@ export const useRealtimeReservations = ({
       console.log("Cleaning up real-time subscription...");
       supabase.removeChannel(channel);
     };
-  }, [userId, onReservationUpdate, toast]);
+  }, [userId, onReservationUpdate]);
 };
