@@ -16,11 +16,12 @@ const PersonalInfoSection = () => {
   //const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [bio, setBio] = useState("")
   const [formData, setFormData] = useState({
     first_name: profile?.first_name || "",
     last_name: profile?.last_name || "",
     phone: profile?.phone || "",
-    bio: (profile as any)?.bio || "",
+    // bio: (profile as any)?.bio || "",
   });
 
   const handleSave = async () => {
@@ -101,9 +102,9 @@ const PersonalInfoSection = () => {
           <Label htmlFor="bio">Bio</Label>
           <Textarea
             id="bio"
-            value={formData.bio}
+            value={bio}
             onChange={(e) =>
-              setFormData((prev) => ({ ...prev, bio: e.target.value }))
+              setBio(e.target.value)
             }
             disabled={!isEditing}
             placeholder="Tell others about yourself and your interest in reducing food waste..."
