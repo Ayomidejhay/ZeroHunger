@@ -1,6 +1,5 @@
 
 
-
 // "use client";
 
 // import React, { useState, useEffect, useCallback } from "react";
@@ -28,12 +27,14 @@
 // import { useRealtimeReservations } from "@/hooks/useRealtimeReservations";
 // import ConnectionStatus from "@/components/dashboard/ConnectionStatus";
 // import Profilepage from "../profilepage/page";
+// import { RecipientDashboardSkeleton } from "@/components/ui/page-skeleton";
 
 // export default function RecipientDashboard() {
-//   const { user, profile } = useAuth();
+//   // authLoading = AuthContext session/profile fetch; dataLoading = our own data fetch
+//   const { user, profile, isLoading: authLoading } = useAuth();
 //   const router = useRouter();
 
-//   const [isLoading, setIsLoading] = useState(true);
+//   const [dataLoading, setDataLoading] = useState(true);
 //   const [reservations, setReservations] = useState<any[]>([]);
 //   const [stats, setStats] = useState({
 //     pending: 0,
@@ -46,7 +47,7 @@
 
 //   const fetchRecipientData = useCallback(async () => {
 //     if (!user) return;
-//     setIsLoading(true);
+//     setDataLoading(true);
 //     try {
 //       const { data: reservationsData, error } = await supabase
 //         .from("reservations")
@@ -86,7 +87,7 @@
 //         description: error.message || "Something went wrong. Please try again.",
 //       });
 //     } finally {
-//       setIsLoading(false);
+//       setDataLoading(false);
 //     }
 //   }, [user]);
 
@@ -96,16 +97,24 @@
 //   });
 
 //   useEffect(() => {
+//     // Wait for AuthContext to finish its initial session + profile fetch.
+//     // Without this guard, the effect runs with user=null and profile=null on
+//     // first render, incorrectly sending logged-in users to /auth/login.
+//     if (authLoading) return;
+
 //     if (!user) {
 //       router.push("/auth/login");
 //       return;
 //     }
-//     if (profile && profile.user_type !== "recipient") {
+
+//     // Profile is guaranteed loaded once authLoading=false and user exists.
+//     if (profile?.user_type !== "recipient") {
 //       router.push("/donordashboard");
 //       return;
 //     }
+
 //     fetchRecipientData();
-//   }, [user, profile, router, fetchRecipientData]);
+//   }, [authLoading, user, profile, router, fetchRecipientData]);
 
 //   const upcomingPickups = reservations.filter((r) => {
 //     if (r.status !== "confirmed" || !r.food_listing?.pickup_time_start) return false;
@@ -115,15 +124,17 @@
 //     return pickupTime >= now && pickupTime <= in24Hours;
 //   }).length;
 
-//   if (isLoading) {
-//     return (
-//       <div className="min-h-screen flex flex-col">
-//         <main className="flex-grow flex items-center justify-center">
-//           <p className="text-neutral600">Loading dashboard...</p>
-//         </main>
-//       </div>
-//     );
-//   }
+//   // Show spinner while auth session is being established OR while data is fetching.
+//   // if (authLoading || dataLoading) {
+//   //   return (
+//   //     <div className="min-h-screen flex flex-col">
+//   //       <main className="flex-grow flex items-center justify-center">
+//   //         <p className="text-neutral600">Loading dashboard...</p>
+//   //       </main>
+//   //     </div>
+//   //   );
+//   // }
+//   if (authLoading || dataLoading) return <RecipientDashboardSkeleton/>;
 
 //   return (
 //     <div className="min-h-screen flex flex-col">
@@ -132,13 +143,13 @@
 //       <main className="flex-grow py-10 bg-gray-50">
 //         <div className="saveplate-container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 //           <div className="max-w-7xl mx-auto">
-//             <div className="flex justify-between items-center mb-8">
+//             <div className="flex flex-col gap-4 md:flex-row justify-between items-center mb-8">
 //               <div>
 //                 <div className="flex items-center gap-3 mb-2">
 //                   <h1 className="text-3xl font-bold text-neutral900">
 //                     Recipient Dashboard
 //                   </h1>
-//                   <ConnectionStatus />
+//                   {/* <ConnectionStatus /> */}
 //                 </div>
 //                 <p className="text-neutral600">
 //                   Welcome back, {profile?.first_name}! Track your food requests here.
@@ -201,6 +212,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { RecipientDashboardSkeleton } from '@/components/ui/page-skeleton';
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/integrations/supabase/client";
@@ -225,14 +237,13 @@ import { useFoodExpiration } from "@/hooks/useFoodExpiration";
 import { useRealtimeReservations } from "@/hooks/useRealtimeReservations";
 import ConnectionStatus from "@/components/dashboard/ConnectionStatus";
 import Profilepage from "../profilepage/page";
-import { RecipientDashboardSkeleton } from "@/components/ui/page-skeleton";
 
 export default function RecipientDashboard() {
   // authLoading = AuthContext session/profile fetch; dataLoading = our own data fetch
   const { user, profile, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
-  const [dataLoading, setDataLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(false);
   const [reservations, setReservations] = useState<any[]>([]);
   const [stats, setStats] = useState({
     pending: 0,
@@ -294,25 +305,24 @@ export default function RecipientDashboard() {
     onReservationUpdate: fetchRecipientData,
   });
 
+  // ── Guard effect ────────────────────────────────────────────────────────────
+  // Deps are primitive values only so this runs exactly once when auth settles.
   useEffect(() => {
-    // Wait for AuthContext to finish its initial session + profile fetch.
-    // Without this guard, the effect runs with user=null and profile=null on
-    // first render, incorrectly sending logged-in users to /auth/login.
     if (authLoading) return;
-
-    if (!user) {
-      router.push("/auth/login");
-      return;
+    if (!user) { router.replace('/auth/login'); return; }
+    if (profile?.user_type && profile.user_type !== 'recipient') {
+      router.replace('/donordashboard');
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading, user?.id, profile?.user_type]);
 
-    // Profile is guaranteed loaded once authLoading=false and user exists.
-    if (profile?.user_type !== "recipient") {
-      router.push("/donordashboard");
-      return;
-    }
-
+  // ── Data fetch effect ────────────────────────────────────────────────────
+  // Only runs once auth is confirmed and role is correct.
+  useEffect(() => {
+    if (authLoading || !user || profile?.user_type !== 'recipient') return;
     fetchRecipientData();
-  }, [authLoading, user, profile, router, fetchRecipientData]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading, user?.id, profile?.user_type]);
 
   const upcomingPickups = reservations.filter((r) => {
     if (r.status !== "confirmed" || !r.food_listing?.pickup_time_start) return false;
@@ -322,17 +332,8 @@ export default function RecipientDashboard() {
     return pickupTime >= now && pickupTime <= in24Hours;
   }).length;
 
-  // Show spinner while auth session is being established OR while data is fetching.
-  // if (authLoading || dataLoading) {
-  //   return (
-  //     <div className="min-h-screen flex flex-col">
-  //       <main className="flex-grow flex items-center justify-center">
-  //         <p className="text-neutral600">Loading dashboard...</p>
-  //       </main>
-  //     </div>
-  //   );
-  // }
-  if (authLoading || dataLoading) return <RecipientDashboardSkeleton/>;
+  if (authLoading) return <RecipientDashboardSkeleton />;
+  if (!user || profile?.user_type !== 'recipient') return null;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -341,13 +342,13 @@ export default function RecipientDashboard() {
       <main className="flex-grow py-10 bg-gray-50">
         <div className="saveplate-container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col gap-4 md:flex-row justify-between items-center mb-8">
+            <div className="flex justify-between items-center mb-8">
               <div>
                 <div className="flex items-center gap-3 mb-2">
                   <h1 className="text-3xl font-bold text-neutral900">
                     Recipient Dashboard
                   </h1>
-                  {/* <ConnectionStatus /> */}
+                  <ConnectionStatus />
                 </div>
                 <p className="text-neutral600">
                   Welcome back, {profile?.first_name}! Track your food requests here.
