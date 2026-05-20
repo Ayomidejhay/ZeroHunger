@@ -1,3 +1,5 @@
+
+
 // 'use client';
 
 // import { createContext, useContext, useEffect, useState } from "react";
@@ -38,8 +40,37 @@
 //      AUTH STATE INITIALIZATION
 //   ---------------------------- */
 //   useEffect(() => {
+//     // getSession() is the initial load — it sets everything and marks
+//     // isLoading = false. onAuthStateChange handles subsequent changes
+//     // (sign-in, sign-out, token refresh) but skips the INITIAL_SESSION
+//     // event to avoid double-fetching the profile on mount.
+//     // getUser() verifies the JWT with the Supabase server on every call —
+//     // unlike getSession() which only reads from the local cookie and can
+//     // return a stale or missing session in production hosted environments
+//     // (Netlify, Vercel) where the cookie isn't always forwarded correctly.
+//     supabase.auth.getUser().then(async ({ data: { user } }) => {
+//       if (user) {
+//         // Also get the full session so we can store the token
+//         const { data: { session } } = await supabase.auth.getSession();
+//         setSession(session);
+//         setUser(user);
+//         await fetchProfile(user.id);
+//       } else {
+//         setSession(null);
+//         setUser(null);
+//         setProfile(null);
+//       }
+//       setIsLoading(false);
+//     });
+
 //     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-//       async (_event, session) => {
+//       async (event, session) => {
+//         // Skip INITIAL_SESSION — already handled by getSession() above.
+//         // Handling it here too causes a double fetchProfile that triggers
+//         // two profile state updates, making dashboard guards run twice and
+//         // producing the donor ↔ recipient flicker.
+//         if (event === 'INITIAL_SESSION') return;
+
 //         setSession(session);
 //         setUser(session?.user ?? null);
 
@@ -50,17 +81,6 @@
 //         }
 //       }
 //     );
-
-//     supabase.auth.getSession().then(async ({ data: { session } }) => {
-//       setSession(session);
-//       setUser(session?.user ?? null);
-
-//       if (session?.user) {
-//         await fetchProfile(session.user.id);
-//       }
-
-//       setIsLoading(false);
-//     });
 
 //     return () => subscription.unsubscribe();
 //   }, []);
@@ -205,6 +225,7 @@
 //   return context;
 // }
 
+
 'use client';
 
 import { createContext, useContext, useEffect, useState } from "react";
@@ -249,21 +270,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // isLoading = false. onAuthStateChange handles subsequent changes
     // (sign-in, sign-out, token refresh) but skips the INITIAL_SESSION
     // event to avoid double-fetching the profile on mount.
-    // getUser() verifies the JWT with the Supabase server on every call —
-    // unlike getSession() which only reads from the local cookie and can
-    // return a stale or missing session in production hosted environments
-    // (Netlify, Vercel) where the cookie isn't always forwarded correctly.
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
-      if (user) {
-        // Also get the full session so we can store the token
-        const { data: { session } } = await supabase.auth.getSession();
-        setSession(session);
-        setUser(user);
-        await fetchProfile(user.id);
-      } else {
-        setSession(null);
-        setUser(null);
-        setProfile(null);
+    // Now that the browser client uses createBrowserClient (which stores
+    // the session in cookies), getSession() works correctly in all environments.
+    // The session cookie is readable by both the client and the middleware,
+    // eliminating the localStorage vs cookie mismatch that caused the
+    // infinite redirect loop in production.
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        await fetchProfile(session.user.id);
       }
       setIsLoading(false);
     });

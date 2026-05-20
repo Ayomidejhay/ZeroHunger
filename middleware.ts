@@ -33,8 +33,9 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // getUser() verifies the token with the Supabase server — more reliable
-  // than getSession() in production where cookies may not be read correctly.
+  // getUser() verifies the token with Supabase server — required in middleware.
+  // Now that the browser client uses createBrowserClient, the session cookie
+  // is always present and getUser() reliably identifies logged-in users.
   const { data: { user } } = await supabase.auth.getUser();
 
   const isProtected =
@@ -43,24 +44,25 @@ export async function middleware(request: NextRequest) {
     recipientOnlyRoutes.some(r => pathname.startsWith(r)) ||
     adminOnlyRoutes.some(r => pathname.startsWith(r));
 
-  // ── 1. Not logged in → redirect to login ─────────────────────────────────
+  // ── 1. Not logged in → protected route → redirect to login ───────────────
   if (!user && isProtected) {
     const loginUrl = new URL('/auth/login', request.url);
     loginUrl.searchParams.set('next', pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  // ── 2. Logged in → fetch profile ONCE for all role checks ────────────────
-  // Only fetch when the user is logged in AND the route needs a role check.
-  // A single fetch is shared across all three checks below — no repeated
-  // DB calls per request which caused timeouts on hosted environments.
-  let userType: string | null = null;
+  // ── 2. Logged in → auth page → let the client handle the redirect ─────────
+  // We intentionally do NOT redirect here. The login/register pages have their
+  // own useEffect that redirects to the correct dashboard after reading the
+  // profile from AuthContext. Doing it in middleware requires a DB call and
+  // risks a redirect before the session cookie is fully established.
+  // The client-side redirect is fast enough and avoids the loop.
 
-  const needsRoleCheck =
-    (user && authRoutes.some(r => pathname.startsWith(r))) ||
-    (user && donorOnlyRoutes.some(r => pathname.startsWith(r))) ||
-    (user && recipientOnlyRoutes.some(r => pathname.startsWith(r))) ||
-    (user && adminOnlyRoutes.some(r => pathname.startsWith(r)));
+  // ── 3. Logged in → wrong-role dashboard → fetch profile once ─────────────
+  const isDonorRoute = donorOnlyRoutes.some(r => pathname.startsWith(r));
+  const isRecipientRoute = recipientOnlyRoutes.some(r => pathname.startsWith(r));
+  const isAdminRoute = adminOnlyRoutes.some(r => pathname.startsWith(r));
+  const needsRoleCheck = user && (isDonorRoute || isRecipientRoute || isAdminRoute);
 
   if (needsRoleCheck) {
     const { data: profile } = await supabase
@@ -69,38 +71,24 @@ export async function middleware(request: NextRequest) {
       .eq('id', user!.id)
       .single();
 
-    userType = profile?.user_type ?? null;
+    const userType = profile?.user_type ?? null;
+
+    if (isDonorRoute && userType && userType !== 'donor') {
+      const dest = userType === 'admin' ? '/admin' : '/recipientdashboard';
+      return NextResponse.redirect(new URL(dest, request.url));
+    }
+
+    if (isRecipientRoute && userType && userType !== 'recipient') {
+      const dest = userType === 'admin' ? '/admin' : '/donordashboard';
+      return NextResponse.redirect(new URL(dest, request.url));
+    }
+
+    if (isAdminRoute && userType !== 'admin') {
+      return NextResponse.redirect(new URL('/', request.url));
+    }
   }
 
-  // ── 3. Logged in → on auth page → redirect to dashboard ──────────────────
-  if (user && authRoutes.some(r => pathname.startsWith(r))) {
-    const dashboard =
-      userType === 'donor' ? '/donordashboard' :
-      userType === 'recipient' ? '/recipientdashboard' :
-      userType === 'admin' ? '/admin' : '/';
-    return NextResponse.redirect(new URL(dashboard, request.url));
-  }
-
-  // ── 4. Wrong role dashboard ───────────────────────────────────────────────
-  const isDonorRoute = donorOnlyRoutes.some(r => pathname.startsWith(r));
-  const isRecipientRoute = recipientOnlyRoutes.some(r => pathname.startsWith(r));
-  const isAdminRoute = adminOnlyRoutes.some(r => pathname.startsWith(r));
-
-  if (user && isDonorRoute && userType !== 'donor') {
-    const dest = userType === 'admin' ? '/admin' : '/recipientdashboard';
-    return NextResponse.redirect(new URL(dest, request.url));
-  }
-
-  if (user && isRecipientRoute && userType !== 'recipient') {
-    const dest = userType === 'admin' ? '/admin' : '/donordashboard';
-    return NextResponse.redirect(new URL(dest, request.url));
-  }
-
-  if (user && isAdminRoute && userType !== 'admin') {
-    return NextResponse.redirect(new URL('/', request.url));
-  }
-
-  // ── 5. All checks passed ──────────────────────────────────────────────────
+  // ── 4. All checks passed ──────────────────────────────────────────────────
   return supabaseResponse;
 }
 
