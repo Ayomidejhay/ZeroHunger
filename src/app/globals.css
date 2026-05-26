@@ -1,4 +1,4 @@
-@import "tailwindcss";
+/* @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -140,4 +140,359 @@
   body {
     @apply bg-background text-foreground;
   }
+} */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
+@import "tailwindcss";
+@import "tw-animate-css";
+
+
+@custom-variant dark (&:is(.dark *));
+
+/* ════════════════════════════════════════════════════════════════
+   TAILWIND THEME TOKENS
+════════════════════════════════════════════════════════════════ */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@theme {
+  --color-lightgreen:    #9be564;
+  --color-defaultgreen:  #76c43b;
+  --color-darkgreen:     #598E2D;
+  --color-lightorange:   #FFB563;
+  --color-defaultorange: #FF9124;
+  --color-darkorange:    #D97200;
+  --color-neutral100:    #F7F9FA;
+  --color-neutral200:    #E8ECEF;
+  --color-neutral300:    #D0D5DD;
+  --color-neutral400:    #98A2B3;
+  --color-neutral500:    #667085;
+  --color-neutral600:    #475467;
+  --color-neutral700:    #344054;
+  --color-neutral800:    #1D2939;
+  --color-neutral900:    #101828;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   CSS CUSTOM PROPERTIES — DESIGN SYSTEM
+   These are the single source of truth for the ZeroHunger brand.
+   Use these in any page or component instead of hardcoded values.
+════════════════════════════════════════════════════════════════ */
+:root {
+  --radius: 0.625rem;
+
+  /* shadcn / Radix tokens */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.141 0.005 285.823);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.141 0.005 285.823);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.141 0.005 285.823);
+  --primary: oklch(0.21 0.006 285.885);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.967 0.001 286.375);
+  --secondary-foreground: oklch(0.21 0.006 285.885);
+  --muted: oklch(0.967 0.001 286.375);
+  --muted-foreground: oklch(0.552 0.016 285.938);
+  --accent: oklch(0.967 0.001 286.375);
+  --accent-foreground: oklch(0.21 0.006 285.885);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.92 0.004 286.32);
+  --input: oklch(0.92 0.004 286.32);
+  --ring: oklch(0.705 0.015 286.067);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.141 0.005 285.823);
+  --sidebar-primary: oklch(0.21 0.006 285.885);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.967 0.001 286.375);
+  --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
+  --sidebar-border: oklch(0.92 0.004 286.32);
+  --sidebar-ring: oklch(0.705 0.015 286.067);
+
+  /* ZeroHunger brand palette */
+  --zh-green-deep:   #1a3a2a;
+  --zh-green-mid:    #2d5a3d;
+  --zh-green-brand:  #76c43b;
+  --zh-green-light:  #9be564;
+  --zh-cream:        #f7f3ed;
+  --zh-cream-dark:   #ede8e0;
+  --zh-orange:       #FF9124;
+  --zh-text-dark:    #0f1f17;
+  --zh-text-mid:     #344054;
+  --zh-text-soft:    #667085;
+
+  /* Typography */
+  --font-editorial: 'Playfair Display', Georgia, serif;
+  --font-body:      'DM Sans', system-ui, sans-serif;
+}
+
+.dark {
+  --background: oklch(0.141 0.005 285.823);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.21 0.006 285.885);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.21 0.006 285.885);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.92 0.004 286.32);
+  --primary-foreground: oklch(0.21 0.006 285.885);
+  --secondary: oklch(0.274 0.006 286.033);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.274 0.006 286.033);
+  --muted-foreground: oklch(0.705 0.015 286.067);
+  --accent: oklch(0.274 0.006 286.033);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.552 0.016 285.938);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.21 0.006 285.885);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.274 0.006 286.033);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.552 0.016 285.938);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   BASE RESET
+════════════════════════════════════════════════════════════════ */
+@layer base {
+  * { @apply border-border outline-ring/50; }
+  body { @apply bg-background text-foreground; }
+  html { scroll-behavior: smooth; }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SHARED DESIGN SYSTEM UTILITIES
+   Copy these class names into any page or component.
+   Never duplicate them — reference this file instead.
+════════════════════════════════════════════════════════════════ */
+
+/* ── Typography ── */
+.zh-font-editorial { font-family: var(--font-editorial); }
+.zh-font-body      { font-family: var(--font-body); }
+
+.zh-eyebrow {
+  display: inline-block;
+  color: var(--zh-green-brand);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.zh-h1 {
+  font-family: var(--font-editorial);
+  font-size: clamp(3rem, 7vw, 6rem);
+  font-weight: 900;
+  line-height: 1.02;
+  color: #fff;
+}
+
+.zh-h2 {
+  font-family: var(--font-editorial);
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--zh-green-deep);
+}
+
+.zh-h2 em, .zh-h1 em { color: var(--zh-green-brand); font-style: italic; }
+
+.zh-body {
+  color: var(--zh-text-soft);
+  font-size: 0.95rem;
+  line-height: 1.85;
+}
+
+/* ── Buttons ── */
+.zh-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--zh-green-brand);
+  color: var(--zh-green-deep);
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 0.8rem 1.65rem;
+  border-radius: 100px;
+  text-decoration: none;
+  transition: all 0.22s ease;
+  box-shadow: 0 4px 20px rgba(118, 196, 59, 0.3);
+  border: none;
+  cursor: pointer;
+}
+.zh-btn-primary:hover {
+  background: var(--zh-green-light);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(118, 196, 59, 0.4);
+}
+
+.zh-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-weight: 500;
+  font-size: 0.88rem;
+  padding: 0.8rem 1.65rem;
+  border-radius: 100px;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(6px);
+  transition: all 0.22s ease;
+  cursor: pointer;
+}
+.zh-btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.zh-btn-outline-dark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  color: var(--zh-green-deep);
+  font-weight: 600;
+  font-size: 0.88rem;
+  padding: 0.8rem 1.65rem;
+  border-radius: 100px;
+  text-decoration: none;
+  border: 1.5px solid var(--zh-green-deep);
+  transition: all 0.22s ease;
+  cursor: pointer;
+}
+.zh-btn-outline-dark:hover {
+  background: var(--zh-green-deep);
+  color: #fff;
+}
+
+/* ── Tag / badge pill ── */
+.zh-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(118, 196, 59, 0.12);
+  border: 1px solid rgba(118, 196, 59, 0.3);
+  color: var(--zh-green-light);
+  padding: 0.35rem 1rem;
+  border-radius: 100px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ── Section containers ── */
+.zh-section { padding: 8rem 2rem; }
+.zh-section-dark { padding: 8rem 2rem; background: var(--zh-green-deep); }
+.zh-section-cream { padding: 8rem 2rem; background: var(--zh-cream); }
+.zh-section-white { padding: 8rem 2rem; background: #fff; }
+.zh-inner { max-width: 1200px; margin: 0 auto; }
+
+/* ── Card ── */
+.zh-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 2.5rem;
+  border: 1px solid var(--zh-cream-dark);
+  transition: all 0.3s ease;
+}
+.zh-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 18px 50px rgba(26, 58, 42, 0.09);
+  border-color: rgba(118, 196, 59, 0.2);
+}
+
+/* ── Noise texture overlay ── */
+.zh-noise {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* ── Animations ── */
+@keyframes zh-fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes zh-ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@keyframes zh-bob {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%       { transform: translateX(-50%) translateY(8px); }
+}
+
+@keyframes zh-spin {
+  to { transform: rotate(360deg); }
+}
+
+.zh-animate-fade-up {
+  animation: zh-fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ── Radial glow decoration ── */
+.zh-glow {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(118, 196, 59, 0.1) 0%, transparent 65%);
 }
