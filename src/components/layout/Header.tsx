@@ -373,7 +373,12 @@ export default function Header() {
           -webkit-backdrop-filter: blur(16px);
           box-shadow: 0 1px 0 rgba(255,255,255,0.06);
         }
-        .hdr--top { background: transparent; }
+        /* .hdr--top { background: transparent; } */
+        .hdr--top {
+  background: rgba(26, 58, 42, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
 
         .hdr-bar {
           max-width: 1200px; margin: 0 auto;
